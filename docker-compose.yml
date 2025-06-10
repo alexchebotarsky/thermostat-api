@@ -1,0 +1,32 @@
+services:
+  thermofridge-api:
+    build: ./
+    privileged: true
+    environment:
+      - LOG_LEVEL=debug
+      - LOG_FORMAT=text
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DATABASE_FILENAME=/data/database.json
+      - DEFAULT_MODE=OFF
+      - DEFAULT_TARGET_TEMPERATURE=20
+      - PUBSUB_HOST=mosquitto
+      - PUBSUB_PORT=1883
+      - PUBSUB_CLIENT_ID=thermofridge-api
+      - PUBSUB_QOS=1
+    ports:
+      - "8000:8000"
+    networks:
+      - mosquitto_network
+      - monitoring_network
+    volumes:
+      - data:/data
+    restart: on-failure
+networks:
+  mosquitto_network:
+    external: true
+  monitoring_network:
+    external: true
+volumes:
+  data:
+    driver: local
