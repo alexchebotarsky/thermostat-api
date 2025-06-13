@@ -58,7 +58,7 @@ func UpdateTargetState(updater TargetStateUpdater, publisher TargetStatePublishe
 			return
 		}
 
-		err = publisher.PublishTargetState(r.Context(), &state)
+		err = publisher.PublishTargetState(r.Context(), updatedState)
 		if err != nil {
 			HandleError(w, fmt.Errorf("error publishing target state: %v", err), http.StatusInternalServerError, true)
 			return
