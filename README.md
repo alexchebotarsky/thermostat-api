@@ -7,8 +7,8 @@
   ```
   [Unit]
   Description=Thermofridge API
-  After=network.target docker.service monitoring.service mosquitto.service
-  Requires=docker.service monitoring.service mosquitto.service
+  After=network.target docker.service monitoring.service mqtt.service
+  Requires=docker.service monitoring.service mqtt.service
 
   [Service]
   Type=simple
