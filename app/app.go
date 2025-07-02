@@ -2,13 +2,11 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
-	"os"
-	"os/signal"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/client"
 	"github.com/alexchebotarsky/thermofridge-api/client/database"
 	"github.com/alexchebotarsky/thermofridge-api/client/pubsub"
 	"github.com/alexchebotarsky/thermofridge-api/env"
@@ -39,9 +37,6 @@ func New(ctx context.Context, env *env.Config) (*App, error) {
 }
 
 func (app *App) Launch(ctx context.Context) {
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
-	defer cancel()
-
 	errc := make(chan error, 1)
 
 	for _, service := range app.Services {
@@ -55,25 +50,25 @@ func (app *App) Launch(ctx context.Context) {
 		slog.Error(fmt.Sprintf("Critical service error: %v", err))
 	}
 
-	var errors []error
+	var errs []error
 
-	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	for _, service := range app.Services {
 		err := service.Stop(ctx)
 		if err != nil {
-			errors = append(errors, fmt.Errorf("error stopping a service: %v", err))
+			errs = append(errs, fmt.Errorf("error stopping a service: %v", err))
 		}
 	}
 
 	err := app.Clients.Close()
 	if err != nil {
-		errors = append(errors, fmt.Errorf("error closing app clients: %v", err))
+		errs = append(errs, fmt.Errorf("error closing app clients: %v", err))
 	}
 
-	if len(errors) > 0 {
-		slog.Error(fmt.Sprintf("Error gracefully shutting down: %v", &client.ErrMultiple{Errs: errors}))
+	if len(errs) > 0 {
+		slog.Error(fmt.Sprintf("Error gracefully shutting down: %v", errors.Join(errs...)))
 	} else {
 		slog.Debug("App has been gracefully shut down")
 	}
@@ -128,10 +123,10 @@ func setupClients(ctx context.Context, env *env.Config) (*Clients, error) {
 }
 
 func (c *Clients) Close() error {
-	var errors []error
+	var errs []error
 
-	if len(errors) > 0 {
-		return &client.ErrMultiple{Errs: errors}
+	if len(errs) > 0 {
+		return errors.Join(errs...)
 	}
 
 	return nil
