@@ -6,16 +6,20 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/alexchebotarsky/thermofridge-api/metrics"
 	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/go-chi/chi/v5"
 )
 
 type TargetStateFetcher interface {
-	FetchTargetState() (*thermofridge.TargetState, error)
+	FetchTargetState(ctx context.Context, deviceID string) (*thermofridge.TargetState, error)
 }
 
 func GetTargetState(fetcher TargetStateFetcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		state, err := fetcher.FetchTargetState()
+		deviceID := chi.URLParam(r, "deviceID")
+
+		state, err := fetcher.FetchTargetState(r.Context(), deviceID)
 		if err != nil {
 			HandleError(w, fmt.Errorf("error fetching target state: %v", err), http.StatusInternalServerError, true)
 			return
@@ -30,7 +34,7 @@ func GetTargetState(fetcher TargetStateFetcher) http.HandlerFunc {
 }
 
 type TargetStateUpdater interface {
-	UpdateTargetState(*thermofridge.TargetState) (*thermofridge.TargetState, error)
+	UpdateTargetState(context.Context, *thermofridge.TargetState) (*thermofridge.TargetState, error)
 }
 
 type TargetStatePublisher interface {
@@ -46,13 +50,16 @@ func UpdateTargetState(updater TargetStateUpdater, publisher TargetStatePublishe
 			return
 		}
 
+		deviceID := chi.URLParam(r, "deviceID")
+		state.DeviceID = deviceID
+
 		err = state.Validate()
 		if err != nil {
 			HandleError(w, fmt.Errorf("error validating target state: %v", err), http.StatusBadRequest, false)
 			return
 		}
 
-		updatedState, err := updater.UpdateTargetState(&state)
+		updatedState, err := updater.UpdateTargetState(r.Context(), &state)
 		if err != nil {
 			HandleError(w, fmt.Errorf("error updating target state: %v", err), http.StatusInternalServerError, true)
 			return
@@ -62,6 +69,14 @@ func UpdateTargetState(updater TargetStateUpdater, publisher TargetStatePublishe
 		if err != nil {
 			HandleError(w, fmt.Errorf("error publishing target state: %v", err), http.StatusInternalServerError, true)
 			return
+		}
+
+		if updatedState.Mode != nil {
+			metrics.SetThermofridgeMode(deviceID, *updatedState.Mode)
+		}
+
+		if updatedState.TargetTemperature != nil {
+			metrics.SetThermofridgeTargetTemperature(deviceID, *updatedState.TargetTemperature)
 		}
 
 		w.Header().Add("Content-Type", "application/json")

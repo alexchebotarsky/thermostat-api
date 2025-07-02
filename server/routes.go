@@ -14,10 +14,10 @@ func (s *Server) setupRoutes() {
 	s.Router.Route(v1API, func(r chi.Router) {
 		r.Use(middleware.Metrics)
 
-		r.Get("/target-state", handler.GetTargetState(s.Clients.Database))
-		r.Post("/target-state", handler.UpdateTargetState(s.Clients.Database, s.Clients.PubSub))
+		r.Get("/target-state/{deviceID}", handler.GetTargetState(s.Clients.Storage))
+		r.Post("/target-state/{deviceID}", handler.UpdateTargetState(s.Clients.Storage, s.Clients.PubSub))
 
-		r.Get("/current-state", handler.GetCurrentState(s.Clients.Database))
+		r.Get("/current-state/{deviceID}", handler.GetCurrentState(s.Clients.Storage))
 	})
 }
 

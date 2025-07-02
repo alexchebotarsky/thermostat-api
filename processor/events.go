@@ -11,6 +11,6 @@ func (p *Processor) setupEvents() {
 
 	p.handle(event.Event{
 		Topic:   "thermofridge/current-state",
-		Handler: handler.CurrentState(p.Clients.Database),
+		Handler: handler.CurrentState(p.Clients.Storage),
 	})
 }

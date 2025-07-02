@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/alexchebotarsky/thermofridge-api/metrics"
 	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
 	"github.com/alexchebotarsky/thermofridge-api/processor/event"
 )
 
 type CurrentStateUpdater interface {
-	UpdateCurrentState(*thermofridge.CurrentState) (*thermofridge.CurrentState, error)
+	UpdateCurrentState(context.Context, *thermofridge.CurrentState) (*thermofridge.CurrentState, error)
 }
 
 func CurrentState(updater CurrentStateUpdater) event.Handler {
@@ -26,10 +27,13 @@ func CurrentState(updater CurrentStateUpdater) event.Handler {
 			return fmt.Errorf("error validating current state: %v", err)
 		}
 
-		_, err = updater.UpdateCurrentState(&state)
+		updatedState, err := updater.UpdateCurrentState(ctx, &state)
 		if err != nil {
 			return fmt.Errorf("error updating current state: %v", err)
 		}
+
+		metrics.SetThermofridgeOperatingState(updatedState.DeviceID, updatedState.OperatingState)
+		metrics.SetThermofridgeCurrentTemperature(updatedState.DeviceID, updatedState.CurrentTemperature)
 
 		return nil
 	}

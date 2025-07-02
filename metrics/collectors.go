@@ -36,22 +36,24 @@ var (
 		[]string{"event_name"},
 	))
 
-	thermofridgeMode = newCollector(prometheus.NewGauge(prometheus.GaugeOpts{
+	thermofridgeMode = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "thermofridge_mode",
 		Help: "Mode of the thermofridge",
-	}))
-	thermofridgeTargetTemperature = newCollector(prometheus.NewGauge(prometheus.GaugeOpts{
+	},
+		[]string{"device_id"}))
+	thermofridgeTargetTemperature = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "thermofridge_target_temperature",
 		Help: "Target temperature of the thermofridge",
-	}))
-	thermofridgeOperatingState = newCollector(prometheus.NewGauge(prometheus.GaugeOpts{
+	},
+		[]string{"device_id"}))
+	thermofridgeOperatingState = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "thermofridge_operating_state",
 		Help: "Operating state of the thermofridge",
-	}))
-	thermofridgeCurrentTemperature = newCollector(prometheus.NewGauge(prometheus.GaugeOpts{
+	}, []string{"device_id"}))
+	thermofridgeCurrentTemperature = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "thermofridge_current_temperature",
 		Help: "Current temperature reading of the thermofridge",
-	}))
+	}, []string{"device_id"}))
 )
 
 func AddRequestHandled(routeName string, statusCode int) {
@@ -70,7 +72,7 @@ func ObserveEventDuration(eventName string, duration time.Duration) {
 	eventsDuration.WithLabelValues(eventName).Observe(duration.Seconds())
 }
 
-func SetThermofridgeMode(mode thermofridge.Mode) {
+func SetThermofridgeMode(deviceID string, mode thermofridge.Mode) {
 	var modeValue float64
 	switch mode {
 	case thermofridge.OffMode:
@@ -85,14 +87,14 @@ func SetThermofridgeMode(mode thermofridge.Mode) {
 		modeValue = -1
 	}
 
-	thermofridgeMode.Set(modeValue)
+	thermofridgeMode.WithLabelValues(deviceID).Set(modeValue)
 }
 
-func SetThermofridgeTargetTemperature(temperature int) {
-	thermofridgeTargetTemperature.Set(float64(temperature))
+func SetThermofridgeTargetTemperature(deviceID string, temperature int) {
+	thermofridgeTargetTemperature.WithLabelValues(deviceID).Set(float64(temperature))
 }
 
-func SetThermofridgeOperatingState(mode thermofridge.OperatingState) {
+func SetThermofridgeOperatingState(deviceID string, mode thermofridge.OperatingState) {
 	var modeValue float64
 	switch mode {
 	case thermofridge.IdleOperatingState:
@@ -105,9 +107,9 @@ func SetThermofridgeOperatingState(mode thermofridge.OperatingState) {
 		modeValue = -1
 	}
 
-	thermofridgeOperatingState.Set(modeValue)
+	thermofridgeOperatingState.WithLabelValues(deviceID).Set(modeValue)
 }
 
-func SetThermofridgeCurrentTemperature(temperature float64) {
-	thermofridgeCurrentTemperature.Set(temperature)
+func SetThermofridgeCurrentTemperature(deviceID string, temperature float64) {
+	thermofridgeCurrentTemperature.WithLabelValues(deviceID).Set(temperature)
 }

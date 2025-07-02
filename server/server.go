@@ -20,17 +20,17 @@ type Server struct {
 }
 
 type Clients struct {
-	Database Database
-	PubSub   PubSub
+	Storage StorageClient
+	PubSub  PubSubClient
 }
 
-type Database interface {
+type StorageClient interface {
 	handler.TargetStateFetcher
 	handler.TargetStateUpdater
 	handler.CurrentStateFetcher
 }
 
-type PubSub interface {
+type PubSubClient interface {
 	handler.TargetStatePublisher
 }
 

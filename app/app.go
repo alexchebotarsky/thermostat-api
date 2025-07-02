@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/client/database"
 	"github.com/alexchebotarsky/thermofridge-api/client/pubsub"
+	"github.com/alexchebotarsky/thermofridge-api/client/storage"
 	"github.com/alexchebotarsky/thermofridge-api/env"
 	"github.com/alexchebotarsky/thermofridge-api/processor"
 	"github.com/alexchebotarsky/thermofridge-api/server"
@@ -83,14 +83,14 @@ func setupServices(env *env.Config, clients *Clients) ([]Service, error) {
 	var services []Service
 
 	s := server.New(env.Host, env.Port, server.Clients{
-		Database: clients.Database,
-		PubSub:   clients.PubSub,
+		Storage: clients.Storage,
+		PubSub:  clients.PubSub,
 	})
 	services = append(services, s)
 
 	p := processor.New(processor.Clients{
-		PubSub:   clients.PubSub,
-		Database: clients.Database,
+		PubSub:  clients.PubSub,
+		Storage: clients.Storage,
 	})
 	services = append(services, p)
 
@@ -98,20 +98,17 @@ func setupServices(env *env.Config, clients *Clients) ([]Service, error) {
 }
 
 type Clients struct {
-	Database *database.Database
-	PubSub   *pubsub.PubSub
+	Storage *storage.Client
+	PubSub  *pubsub.Client
 }
 
 func setupClients(ctx context.Context, env *env.Config) (*Clients, error) {
 	var c Clients
 	var err error
 
-	c.Database, err = database.New(env.DatabaseFilename, map[string]string{
-		database.ModeKey:              env.DefaultMode,
-		database.TargetTemperatureKey: fmt.Sprintf("%d", env.DefaultTargetTemperature),
-	})
+	c.Storage, err = storage.New(ctx, env.StoragePath, env.DefaultMode, env.DefaultTargetTemperature)
 	if err != nil {
-		return nil, fmt.Errorf("error creating new database client: %v", err)
+		return nil, fmt.Errorf("error creating new storage client: %v", err)
 	}
 
 	c.PubSub, err = pubsub.New(ctx, env.PubSubHost, env.PubSubPort, env.PubSubClientID, env.PubSubQoS)
@@ -124,6 +121,11 @@ func setupClients(ctx context.Context, env *env.Config) (*Clients, error) {
 
 func (c *Clients) Close() error {
 	var errs []error
+
+	err := c.Storage.Close()
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error closing storage client: %v", err))
+	}
 
 	if len(errs) > 0 {
 		return errors.Join(errs...)

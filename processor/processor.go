@@ -16,15 +16,15 @@ type Processor struct {
 }
 
 type Clients struct {
-	PubSub   PubSubClient
-	Database Database
+	PubSub  PubSubClient
+	Storage StorageClient
 }
 
 type PubSubClient interface {
 	Subscribe(ctx context.Context, topic string, handler event.Handler) error
 }
 
-type Database interface {
+type StorageClient interface {
 	handler.CurrentStateUpdater
 }
 

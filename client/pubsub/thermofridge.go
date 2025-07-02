@@ -8,7 +8,7 @@ import (
 	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
 )
 
-func (p *PubSub) PublishTargetState(ctx context.Context, state *thermofridge.TargetState) error {
+func (p *Client) PublishTargetState(ctx context.Context, state *thermofridge.TargetState) error {
 	payload, err := json.Marshal(&state)
 	if err != nil {
 		return fmt.Errorf("error marshalling target state: %v", err)

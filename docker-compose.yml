@@ -7,7 +7,7 @@ services:
       - LOG_FORMAT=text
       - HOST=0.0.0.0
       - PORT=8001
-      - DATABASE_FILENAME=/data/database.json
+      - STORAGE_PATH=/data/storage.db
       - DEFAULT_MODE=OFF
       - DEFAULT_TARGET_TEMPERATURE=20
       - PUBSUB_HOST=mosquitto

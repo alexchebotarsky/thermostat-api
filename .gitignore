@@ -1,3 +1,3 @@
 .env
 main
-database.json
+storage.db

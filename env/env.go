@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
 	"github.com/joho/godotenv"
 	envconfig "github.com/sethvargo/go-envconfig"
 )
@@ -16,10 +17,10 @@ type Config struct {
 	Host string `env:"HOST,default=localhost"`
 	Port uint16 `env:"PORT,default=8000"`
 
-	DatabaseFilename string `env:"DATABASE_FILENAME,default=./database.json"`
+	StoragePath string `env:"STORAGE_PATH,default=./storage.db"`
 
-	DefaultMode              string `env:"DEFAULT_MODE,default=OFF"`
-	DefaultTargetTemperature int    `env:"DEFAULT_TARGET_TEMPERATURE,default=20"`
+	DefaultMode              thermofridge.Mode `env:"DEFAULT_MODE,default=OFF"`
+	DefaultTargetTemperature int               `env:"DEFAULT_TARGET_TEMPERATURE,default=20"`
 
 	PubSubHost     string `env:"PUBSUB_HOST,default=localhost"`
 	PubSubPort     uint16 `env:"PUBSUB_PORT,default=1883"`
