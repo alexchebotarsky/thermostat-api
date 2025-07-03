@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/alexchebotarsky/thermofridge-api/client"
+	"github.com/alexchebotarsky/thermofridge-api/metrics"
 	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
 	"github.com/go-chi/chi/v5"
 )
@@ -35,6 +36,9 @@ func GetCurrentState(fetcher CurrentStateFetcher) http.HandlerFunc {
 			HandleError(w, fmt.Errorf("error invalid current state: %v", err), http.StatusInternalServerError, true)
 			return
 		}
+
+		metrics.SetThermofridgeOperatingState(deviceID, state.OperatingState)
+		metrics.SetThermofridgeCurrentTemperature(deviceID, state.CurrentTemperature)
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
