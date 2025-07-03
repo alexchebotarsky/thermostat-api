@@ -14,7 +14,8 @@ func (c *Client) initCurrentStateTable(ctx context.Context) error {
 		CREATE TABLE IF NOT EXISTS current_state (
 			device_id TEXT PRIMARY KEY,
 			operating_state TEXT,
-			current_temperature REAL
+			current_temperature REAL,
+			timestamp DATETIME
 		);
 	`
 
@@ -28,7 +29,7 @@ func (c *Client) initCurrentStateTable(ctx context.Context) error {
 
 func (c *Client) FetchCurrentState(ctx context.Context, deviceID string) (*thermofridge.CurrentState, error) {
 	query := `
-		SELECT device_id, operating_state, current_temperature
+		SELECT device_id, operating_state, current_temperature, timestamp
 		FROM current_state
 		WHERE device_id = $1;
 	`
@@ -48,11 +49,12 @@ func (c *Client) FetchCurrentState(ctx context.Context, deviceID string) (*therm
 
 func (c *Client) UpdateCurrentState(ctx context.Context, state *thermofridge.CurrentState) (*thermofridge.CurrentState, error) {
 	query := `
-		INSERT INTO current_state (device_id, operating_state, current_temperature)
-		VALUES (:device_id, :operating_state, :current_temperature)
+		INSERT INTO current_state (device_id, operating_state, current_temperature, timestamp)
+		VALUES (:device_id, :operating_state, :current_temperature, :timestamp)
 		ON CONFLICT(device_id) DO UPDATE SET
 			operating_state = :operating_state,
-			current_temperature = :current_temperature;
+			current_temperature = :current_temperature,
+			timestamp = :timestamp;
 	`
 
 	_, err := c.db.NamedExecContext(ctx, query, state)

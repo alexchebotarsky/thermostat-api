@@ -14,7 +14,7 @@ func (s *TargetState) Validate() error {
 		case OffMode, HeatMode, CoolMode, AutoMode:
 			// Valid
 		default:
-			return fmt.Errorf("mode must be one of: [%s, %s, %s, %s], got: %s", OffMode, HeatMode, CoolMode, AutoMode, *s.Mode)
+			return fmt.Errorf("mode must be one of: [%s, %s, %s, %s], got: %q", OffMode, HeatMode, CoolMode, AutoMode, *s.Mode)
 		}
 	}
 

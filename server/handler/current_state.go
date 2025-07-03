@@ -30,6 +30,12 @@ func GetCurrentState(fetcher CurrentStateFetcher) http.HandlerFunc {
 			return
 		}
 
+		err = state.Validate()
+		if err != nil {
+			HandleError(w, fmt.Errorf("error invalid current state: %v", err), http.StatusInternalServerError, true)
+			return
+		}
+
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 

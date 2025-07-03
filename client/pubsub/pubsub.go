@@ -98,7 +98,8 @@ func (p *Client) handleMessage(message paho.PublishReceived) (bool, error) {
 		if message.Packet.Topic == topic {
 			err := handler(context.Background(), message.Packet.Payload)
 			if err != nil {
-				return true, fmt.Errorf("error handling message: %v", err)
+				slog.Error(fmt.Sprintf("Error handling message for topic %s: %v", topic, err))
+				return true, err
 			}
 		}
 	}
@@ -107,5 +108,5 @@ func (p *Client) handleMessage(message paho.PublishReceived) (bool, error) {
 }
 
 func (p *Client) handleConnectError(err error) {
-	slog.Error(fmt.Sprintf("error with pubsub connection: %s", err))
+	slog.Error(fmt.Sprintf("error with pubsub connection: %v", err))
 }
