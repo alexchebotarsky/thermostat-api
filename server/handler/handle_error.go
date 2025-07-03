@@ -16,12 +16,13 @@ func HandleError(w http.ResponseWriter, handlerErr error, statusCode int, should
 	w.WriteHeader(statusCode)
 
 	// Hide server errors from the client
+	returnedErr := handlerErr
 	if statusCode >= 500 {
-		handlerErr = fmt.Errorf("%s: %d", http.StatusText(statusCode), statusCode)
+		returnedErr = fmt.Errorf("%s: %d", http.StatusText(statusCode), statusCode)
 	}
 
 	err := json.NewEncoder(w).Encode(errorResponse{
-		Error:      handlerErr.Error(),
+		Error:      returnedErr.Error(),
 		StatusCode: statusCode,
 	})
 	handleWritingErr(err)
