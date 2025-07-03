@@ -9,6 +9,8 @@ import (
 
 func (s *Server) setupRoutes() {
 	s.Router.Get("/_healthz", handler.Health)
+	s.Router.Get("/openapi.yaml", handler.OpenapiYAML)
+	s.Router.Get("/docs", handler.SwaggerUI)
 	s.Router.Handle("/metrics", promhttp.Handler())
 
 	s.Router.Route(v1API, func(r chi.Router) {

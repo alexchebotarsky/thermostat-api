@@ -1,0 +1,183 @@
+openapi: 3.1.1
+
+info:
+  title: thermofridge-api
+  description: API for my beer-brewing fridge that maintains set temperature
+  version: 1.0.0
+
+paths:
+  /_healthz:
+    get:
+      summary: Health Check
+      description: Endpoint to check if the API is up and running
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+
+  /api/v1/target-state/{deviceId}:
+    get:
+      summary: Get Target State
+      description: Retrieve the target state of a device
+      parameters:
+        - $ref: "#/components/parameters/deviceId"
+      responses:
+        "200":
+          description: Target state fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TargetState"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Set Target State
+      description: Update the target state of a device
+      parameters:
+        - $ref: "#/components/parameters/deviceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  $ref: "#/components/schemas/mode"
+                targetTemperature:
+                  $ref: "#/components/schemas/targetTemperature"
+      responses:
+        "200":
+          description: Target state updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TargetState"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/current-state/{deviceId}:
+    get:
+      summary: Get Current State
+      description: Retrieve the current state of a device
+      parameters:
+        - $ref: "#/components/parameters/deviceId"
+      responses:
+        "200":
+          description: Current state fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentState"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    deviceId:
+      type: string
+      description: Unique identifier for the device
+      example: "2bd15a47-5bf5-46b0-9cdd-cb18d63cb494"
+    mode:
+      type: string
+      description: Chosen mode for the device
+      enum:
+        - OFF
+        - HEAT
+        - COOL
+        - AUTO
+    targetTemperature:
+      type: number
+      format: int
+      description: Configured target temperature in Celsius
+      minimum: 0
+      maximum: 25
+    operatingState:
+      type: string
+      description: Current operating state of the device
+      enum:
+        - IDLE
+        - HEATING
+        - COOLING
+    currentTemperature:
+      type: number
+      format: float
+      description: Current measured temperature in Celsius
+      minimum: -55
+      maximum: 125
+    timestamp:
+      type: string
+      format: date-time
+      description: Timestamp in RFC3339 format
+      example: "2024-06-07T12:34:56Z"
+    TargetState:
+      type: object
+      properties:
+        deviceId:
+          $ref: "#/components/schemas/deviceId"
+        mode:
+          $ref: "#/components/schemas/mode"
+        targetTemperature:
+          $ref: "#/components/schemas/targetTemperature"
+    CurrentState:
+      type: object
+      properties:
+        deviceId:
+          $ref: "#/components/schemas/deviceId"
+        operatingState:
+          $ref: "#/components/schemas/operatingState"
+        currentTemperature:
+          $ref: "#/components/schemas/currentTemperature"
+        timestamp:
+          $ref: "#/components/schemas/timestamp"
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        statusCode:
+          type: integer
+          description: HTTP status code
+      example:
+        error: "Error Message"
+        statusCode: 500
+
+  parameters:
+    deviceId:
+      name: deviceId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/deviceId"
