@@ -6,7 +6,7 @@ services:
       - LOG_LEVEL=debug
       - LOG_FORMAT=text
       - HOST=0.0.0.0
-      - PORT=8001
+      - PORT=8000
       - STORAGE_PATH=/data/storage.db
       - DEFAULT_MODE=OFF
       - DEFAULT_TARGET_TEMPERATURE=20
@@ -15,7 +15,7 @@ services:
       - PUBSUB_CLIENT_ID=thermostat-api
       - PUBSUB_QOS=1
     ports:
-      - "8001:8001"
+      - "8000:8000"
     networks:
       - mqtt_network
       - monitoring_network
