@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/alexchebotarsky/thermofridge-api/client"
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/client"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 )
 
 func (c *Client) initCurrentStateTable(ctx context.Context) error {
@@ -27,14 +27,14 @@ func (c *Client) initCurrentStateTable(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) FetchCurrentState(ctx context.Context, deviceID string) (*thermofridge.CurrentState, error) {
+func (c *Client) FetchCurrentState(ctx context.Context, deviceID string) (*thermostat.CurrentState, error) {
 	query := `
 		SELECT device_id, operating_state, current_temperature, timestamp
 		FROM current_state
 		WHERE device_id = $1;
 	`
 
-	var state thermofridge.CurrentState
+	var state thermostat.CurrentState
 	err := c.db.GetContext(ctx, &state, query, deviceID)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -47,7 +47,7 @@ func (c *Client) FetchCurrentState(ctx context.Context, deviceID string) (*therm
 	return &state, nil
 }
 
-func (c *Client) UpdateCurrentState(ctx context.Context, state *thermofridge.CurrentState) (*thermofridge.CurrentState, error) {
+func (c *Client) UpdateCurrentState(ctx context.Context, state *thermostat.CurrentState) (*thermostat.CurrentState, error) {
 	query := `
 		INSERT INTO current_state (device_id, operating_state, current_temperature, timestamp)
 		VALUES (:device_id, :operating_state, :current_temperature, :timestamp)

@@ -1,4 +1,4 @@
-module github.com/alexchebotarsky/thermofridge-api
+module github.com/alexchebotarsky/thermostat-api
 
 go 1.24.4
 

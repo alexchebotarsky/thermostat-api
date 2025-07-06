@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 	"github.com/joho/godotenv"
 	envconfig "github.com/sethvargo/go-envconfig"
 )
@@ -19,12 +19,12 @@ type Config struct {
 
 	StoragePath string `env:"STORAGE_PATH,default=./storage.db"`
 
-	DefaultMode              thermofridge.Mode `env:"DEFAULT_MODE,default=OFF"`
-	DefaultTargetTemperature int               `env:"DEFAULT_TARGET_TEMPERATURE,default=20"`
+	DefaultMode              thermostat.Mode `env:"DEFAULT_MODE,default=OFF"`
+	DefaultTargetTemperature int             `env:"DEFAULT_TARGET_TEMPERATURE,default=20"`
 
 	PubSubHost     string `env:"PUBSUB_HOST,default=localhost"`
 	PubSubPort     uint16 `env:"PUBSUB_PORT,default=1883"`
-	PubSubClientID string `env:"PUBSUB_CLIENT_ID,default=thermofridge-api"`
+	PubSubClientID string `env:"PUBSUB_CLIENT_ID,default=thermostat-api"`
 	PubSubQoS      byte   `env:"PUBSUB_QOS,default=1"`
 }
 

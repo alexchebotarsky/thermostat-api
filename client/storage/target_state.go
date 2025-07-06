@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 )
 
 func (c *Client) initTargetStateTable(ctx context.Context) error {
@@ -25,7 +25,7 @@ func (c *Client) initTargetStateTable(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) FetchTargetState(ctx context.Context, deviceID string) (*thermofridge.TargetState, error) {
+func (c *Client) FetchTargetState(ctx context.Context, deviceID string) (*thermostat.TargetState, error) {
 	query := `
 		SELECT target_temperature, mode
 		FROM target_state
@@ -41,12 +41,12 @@ func (c *Client) FetchTargetState(ctx context.Context, deviceID string) (*thermo
 		return nil, fmt.Errorf("error executing FetchTargetState query: %v", err)
 	}
 
-	state := thermofridge.TargetState{
+	state := thermostat.TargetState{
 		DeviceID: deviceID,
 	}
 
 	if data.Mode.Valid {
-		modeValue := thermofridge.Mode(data.Mode.String)
+		modeValue := thermostat.Mode(data.Mode.String)
 		state.Mode = &modeValue
 	} else {
 		state.Mode = &c.defaultMode
@@ -70,7 +70,7 @@ func (c *Client) FetchTargetState(ctx context.Context, deviceID string) (*thermo
 	return &state, nil
 }
 
-func (c *Client) UpdateTargetState(ctx context.Context, state *thermofridge.TargetState) (*thermofridge.TargetState, error) {
+func (c *Client) UpdateTargetState(ctx context.Context, state *thermostat.TargetState) (*thermostat.TargetState, error) {
 	if state.Mode != nil {
 		err := c.updateMode(ctx, state.DeviceID, *state.Mode)
 		if err != nil {
@@ -88,7 +88,7 @@ func (c *Client) UpdateTargetState(ctx context.Context, state *thermofridge.Targ
 	return c.FetchTargetState(ctx, state.DeviceID)
 }
 
-func (c *Client) updateMode(ctx context.Context, deviceID string, mode thermofridge.Mode) error {
+func (c *Client) updateMode(ctx context.Context, deviceID string, mode thermostat.Mode) error {
 	query := `
 		INSERT INTO target_state (device_id, mode)
 		VALUES ($1, $2)

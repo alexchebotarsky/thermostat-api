@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/alexchebotarsky/thermofridge-api/client"
-	"github.com/alexchebotarsky/thermofridge-api/metrics"
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/client"
+	"github.com/alexchebotarsky/thermostat-api/metrics"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 	"github.com/go-chi/chi/v5"
 )
 
 type CurrentStateFetcher interface {
-	FetchCurrentState(ctx context.Context, deviceID string) (*thermofridge.CurrentState, error)
+	FetchCurrentState(ctx context.Context, deviceID string) (*thermostat.CurrentState, error)
 }
 
 func GetCurrentState(fetcher CurrentStateFetcher) http.HandlerFunc {
@@ -37,8 +37,8 @@ func GetCurrentState(fetcher CurrentStateFetcher) http.HandlerFunc {
 			return
 		}
 
-		metrics.SetThermofridgeOperatingState(deviceID, state.OperatingState)
-		metrics.SetThermofridgeCurrentTemperature(deviceID, state.CurrentTemperature)
+		metrics.SetThermostatOperatingState(deviceID, state.OperatingState)
+		metrics.SetThermostatCurrentTemperature(deviceID, state.CurrentTemperature)
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

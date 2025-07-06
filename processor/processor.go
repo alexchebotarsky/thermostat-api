@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/alexchebotarsky/thermofridge-api/processor/event"
-	"github.com/alexchebotarsky/thermofridge-api/processor/handler"
+	"github.com/alexchebotarsky/thermostat-api/processor/event"
+	"github.com/alexchebotarsky/thermostat-api/processor/handler"
 )
 
 type Processor struct {

@@ -7,10 +7,10 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/alexchebotarsky/thermofridge-api/app"
-	"github.com/alexchebotarsky/thermofridge-api/env"
-	"github.com/alexchebotarsky/thermofridge-api/logger"
-	"github.com/alexchebotarsky/thermofridge-api/metrics"
+	"github.com/alexchebotarsky/thermostat-api/app"
+	"github.com/alexchebotarsky/thermostat-api/env"
+	"github.com/alexchebotarsky/thermostat-api/logger"
+	"github.com/alexchebotarsky/thermostat-api/metrics"
 )
 
 func main() {

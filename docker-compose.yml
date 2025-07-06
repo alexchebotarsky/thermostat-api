@@ -1,5 +1,5 @@
 services:
-  thermofridge-api:
+  thermostat-api:
     build: ./
     privileged: true
     environment:
@@ -12,7 +12,7 @@ services:
       - DEFAULT_TARGET_TEMPERATURE=20
       - PUBSUB_HOST=mosquitto
       - PUBSUB_PORT=1883
-      - PUBSUB_CLIENT_ID=thermofridge-api
+      - PUBSUB_CLIENT_ID=thermostat-api
       - PUBSUB_QOS=1
     ports:
       - "8001:8001"

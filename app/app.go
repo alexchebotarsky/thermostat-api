@@ -7,11 +7,11 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/client/pubsub"
-	"github.com/alexchebotarsky/thermofridge-api/client/storage"
-	"github.com/alexchebotarsky/thermofridge-api/env"
-	"github.com/alexchebotarsky/thermofridge-api/processor"
-	"github.com/alexchebotarsky/thermofridge-api/server"
+	"github.com/alexchebotarsky/thermostat-api/client/pubsub"
+	"github.com/alexchebotarsky/thermostat-api/client/storage"
+	"github.com/alexchebotarsky/thermostat-api/env"
+	"github.com/alexchebotarsky/thermostat-api/processor"
+	"github.com/alexchebotarsky/thermostat-api/server"
 )
 
 type App struct {

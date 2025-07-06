@@ -10,17 +10,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/alexchebotarsky/thermofridge-api/client"
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/client"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 )
 
 type fakeTargetStateFetcher struct {
-	States map[string]thermofridge.TargetState
+	States map[string]thermostat.TargetState
 
 	shouldFail bool
 }
 
-func (f *fakeTargetStateFetcher) FetchTargetState(ctx context.Context, deviceID string) (*thermofridge.TargetState, error) {
+func (f *fakeTargetStateFetcher) FetchTargetState(ctx context.Context, deviceID string) (*thermostat.TargetState, error) {
 	if f.shouldFail {
 		return nil, errors.New("test error")
 	}
@@ -34,7 +34,7 @@ func (f *fakeTargetStateFetcher) FetchTargetState(ctx context.Context, deviceID 
 }
 
 func TestGetTargetState(t *testing.T) {
-	testMode := thermofridge.HeatMode
+	testMode := thermostat.HeatMode
 	testTargetTemperature := 25
 
 	type args struct {
@@ -47,13 +47,13 @@ func TestGetTargetState(t *testing.T) {
 		// HTTP response expectations
 		wantStatus int
 		wantErr    bool
-		wantBody   *thermofridge.TargetState
+		wantBody   *thermostat.TargetState
 	}{
 		{
 			name: "should fetch target state",
 			args: args{
 				fetcher: &fakeTargetStateFetcher{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &testMode,
@@ -69,7 +69,7 @@ func TestGetTargetState(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantErr:    false,
-			wantBody: &thermofridge.TargetState{
+			wantBody: &thermostat.TargetState{
 				DeviceID:          "test_device_id",
 				Mode:              &testMode,
 				TargetTemperature: &testTargetTemperature,
@@ -79,7 +79,7 @@ func TestGetTargetState(t *testing.T) {
 			name: "should return error 500, if failed to fetch",
 			args: args{
 				fetcher: &fakeTargetStateFetcher{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &testMode,
@@ -118,7 +118,7 @@ func TestGetTargetState(t *testing.T) {
 			}
 
 			// Decode the response body into struct for checking
-			var resBody thermofridge.TargetState
+			var resBody thermostat.TargetState
 			if err := json.NewDecoder(w.Body).Decode(&resBody); err != nil {
 				t.Fatalf("GetTargetState() error json decoding response body: %v", err)
 			}
@@ -138,12 +138,12 @@ func TestGetTargetState(t *testing.T) {
 }
 
 type fakeTargetStateUpdater struct {
-	States map[string]thermofridge.TargetState
+	States map[string]thermostat.TargetState
 
 	shouldFail bool
 }
 
-func (f *fakeTargetStateUpdater) UpdateTargetState(ctx context.Context, state *thermofridge.TargetState) (*thermofridge.TargetState, error) {
+func (f *fakeTargetStateUpdater) UpdateTargetState(ctx context.Context, state *thermostat.TargetState) (*thermostat.TargetState, error) {
 	if f.shouldFail {
 		return nil, errors.New("test error")
 	}
@@ -169,12 +169,12 @@ func (f *fakeTargetStateUpdater) UpdateTargetState(ctx context.Context, state *t
 }
 
 type fakeTargetStatePublisher struct {
-	States []thermofridge.TargetState
+	States []thermostat.TargetState
 
 	shouldFail bool
 }
 
-func (m *fakeTargetStatePublisher) PublishTargetState(ctx context.Context, state *thermofridge.TargetState) error {
+func (m *fakeTargetStatePublisher) PublishTargetState(ctx context.Context, state *thermostat.TargetState) error {
 	if m.shouldFail {
 		return errors.New("test error")
 	}
@@ -187,11 +187,11 @@ func (m *fakeTargetStatePublisher) PublishTargetState(ctx context.Context, state
 }
 
 func TestUpdateTargetState(t *testing.T) {
-	initialMode := thermofridge.HeatMode
+	initialMode := thermostat.HeatMode
 	initialTargetTemperature := 25
-	updatedMode := thermofridge.CoolMode
+	updatedMode := thermostat.CoolMode
 	updatedTargetTemperature := 15
-	invalidMode := thermofridge.Mode("INVALID_MODE")
+	invalidMode := thermostat.Mode("INVALID_MODE")
 	invalidTargetTemperature := -5
 
 	type args struct {
@@ -205,17 +205,17 @@ func TestUpdateTargetState(t *testing.T) {
 		// HTTP response expectations
 		wantStatus int
 		wantErr    bool
-		wantBody   *thermofridge.TargetState
+		wantBody   *thermostat.TargetState
 		// Updater expectations
-		wantUpdaterStates map[string]*thermofridge.TargetState
+		wantUpdaterStates map[string]*thermostat.TargetState
 		// Publisher expectations
-		wantPublisherStates []*thermofridge.TargetState
+		wantPublisherStates []*thermostat.TargetState
 	}{
 		{
 			name: "should update target state and publish updated state",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -225,7 +225,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: false,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -240,19 +240,19 @@ func TestUpdateTargetState(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantErr:    false,
-			wantBody: &thermofridge.TargetState{
+			wantBody: &thermostat.TargetState{
 				DeviceID:          "test_device_id",
 				Mode:              &updatedMode,
 				TargetTemperature: &updatedTargetTemperature,
 			},
-			wantUpdaterStates: map[string]*thermofridge.TargetState{
+			wantUpdaterStates: map[string]*thermostat.TargetState{
 				"test_device_id": {
 					DeviceID:          "test_device_id",
 					Mode:              &updatedMode,
 					TargetTemperature: &updatedTargetTemperature,
 				},
 			},
-			wantPublisherStates: []*thermofridge.TargetState{
+			wantPublisherStates: []*thermostat.TargetState{
 				{
 					DeviceID:          "test_device_id",
 					Mode:              &updatedMode,
@@ -264,7 +264,7 @@ func TestUpdateTargetState(t *testing.T) {
 			name: "should update only mode and publish updated state",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -274,7 +274,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: false,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -288,19 +288,19 @@ func TestUpdateTargetState(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantErr:    false,
-			wantBody: &thermofridge.TargetState{
+			wantBody: &thermostat.TargetState{
 				DeviceID:          "test_device_id",
 				Mode:              &updatedMode,
 				TargetTemperature: &initialTargetTemperature,
 			},
-			wantUpdaterStates: map[string]*thermofridge.TargetState{
+			wantUpdaterStates: map[string]*thermostat.TargetState{
 				"test_device_id": {
 					DeviceID:          "test_device_id",
 					Mode:              &updatedMode,
 					TargetTemperature: &initialTargetTemperature,
 				},
 			},
-			wantPublisherStates: []*thermofridge.TargetState{
+			wantPublisherStates: []*thermostat.TargetState{
 				{
 					DeviceID:          "test_device_id",
 					Mode:              &updatedMode,
@@ -312,7 +312,7 @@ func TestUpdateTargetState(t *testing.T) {
 			name: "should update only target temperature and publish updated state",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -322,7 +322,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: false,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -336,19 +336,19 @@ func TestUpdateTargetState(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantErr:    false,
-			wantBody: &thermofridge.TargetState{
+			wantBody: &thermostat.TargetState{
 				DeviceID:          "test_device_id",
 				Mode:              &initialMode,
 				TargetTemperature: &updatedTargetTemperature,
 			},
-			wantUpdaterStates: map[string]*thermofridge.TargetState{
+			wantUpdaterStates: map[string]*thermostat.TargetState{
 				"test_device_id": {
 					DeviceID:          "test_device_id",
 					Mode:              &initialMode,
 					TargetTemperature: &updatedTargetTemperature,
 				},
 			},
-			wantPublisherStates: []*thermofridge.TargetState{
+			wantPublisherStates: []*thermostat.TargetState{
 				{
 					DeviceID:          "test_device_id",
 					Mode:              &initialMode,
@@ -360,7 +360,7 @@ func TestUpdateTargetState(t *testing.T) {
 			name: "should return error 400, if request body is invalid JSON",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -370,7 +370,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: false,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -389,7 +389,7 @@ func TestUpdateTargetState(t *testing.T) {
 			name: "should return error 400, if request body has invalid values",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -399,7 +399,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: false,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -419,7 +419,7 @@ func TestUpdateTargetState(t *testing.T) {
 			name: "should return error 500, if failed to update",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -429,7 +429,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: true,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -449,7 +449,7 @@ func TestUpdateTargetState(t *testing.T) {
 			name: "should return error 500, if failed to publish",
 			args: args{
 				updater: &fakeTargetStateUpdater{
-					States: map[string]thermofridge.TargetState{
+					States: map[string]thermostat.TargetState{
 						"test_device_id": {
 							DeviceID:          "test_device_id",
 							Mode:              &initialMode,
@@ -459,7 +459,7 @@ func TestUpdateTargetState(t *testing.T) {
 					shouldFail: false,
 				},
 				publisher: &fakeTargetStatePublisher{
-					States:     []thermofridge.TargetState{},
+					States:     []thermostat.TargetState{},
 					shouldFail: true,
 				},
 				req: addChiURLParams(
@@ -496,7 +496,7 @@ func TestUpdateTargetState(t *testing.T) {
 			}
 
 			// Decode the response body into struct for checking
-			var resBody thermofridge.TargetState
+			var resBody thermostat.TargetState
 			if err := json.NewDecoder(w.Body).Decode(&resBody); err != nil {
 				t.Fatalf("UpdateTargetState() error json decoding response body: %v", err)
 			}

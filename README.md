@@ -1,19 +1,19 @@
-# thermofridge-api
+# thermostat-api
 
 ### Installation
 
-- Add custom systemctl service in `/etc/systemd/system/thermofridge-api.service`:
+- Add custom systemctl service in `/etc/systemd/system/thermostat-api.service`:
 
   ```
   [Unit]
-  Description=Thermofridge API
+  Description=Thermostat API
   After=network.target docker.service monitoring.service mqtt.service
   Requires=docker.service monitoring.service mqtt.service
 
   [Service]
   Type=simple
   User=USER_NAME_HERE
-  WorkingDirectory=/path/to/thermofridge-api
+  WorkingDirectory=/path/to/thermostat-api
   ExecStart=docker compose up
   ExecStop=docker compose down
   Restart=on-failure
@@ -27,5 +27,5 @@
   Then enable the service to run on startup:
 
   ```
-  sudo systemctl enable thermofridge-api.service
+  sudo systemctl enable thermostat-api.service
   ```

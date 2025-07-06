@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -36,23 +36,23 @@ var (
 		[]string{"event_name"},
 	))
 
-	thermofridgeMode = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "thermofridge_mode",
-		Help: "Mode of the thermofridge",
+	thermostatMode = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "thermostat_mode",
+		Help: "Mode of the thermostat",
 	},
 		[]string{"device_id"}))
-	thermofridgeTargetTemperature = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "thermofridge_target_temperature",
-		Help: "Target temperature of the thermofridge",
+	thermostatTargetTemperature = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "thermostat_target_temperature",
+		Help: "Target temperature of the thermostat",
 	},
 		[]string{"device_id"}))
-	thermofridgeOperatingState = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "thermofridge_operating_state",
-		Help: "Operating state of the thermofridge",
+	thermostatOperatingState = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "thermostat_operating_state",
+		Help: "Operating state of the thermostat",
 	}, []string{"device_id"}))
-	thermofridgeCurrentTemperature = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "thermofridge_current_temperature",
-		Help: "Current temperature reading of the thermofridge",
+	thermostatCurrentTemperature = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "thermostat_current_temperature",
+		Help: "Current temperature reading of the thermostat",
 	}, []string{"device_id"}))
 )
 
@@ -72,44 +72,44 @@ func ObserveEventDuration(eventName string, duration time.Duration) {
 	eventsDuration.WithLabelValues(eventName).Observe(duration.Seconds())
 }
 
-func SetThermofridgeMode(deviceID string, mode thermofridge.Mode) {
+func SetThermostatMode(deviceID string, mode thermostat.Mode) {
 	var modeValue float64
 	switch mode {
-	case thermofridge.OffMode:
+	case thermostat.OffMode:
 		modeValue = 0
-	case thermofridge.HeatMode:
+	case thermostat.HeatMode:
 		modeValue = 1
-	case thermofridge.CoolMode:
+	case thermostat.CoolMode:
 		modeValue = 2
-	case thermofridge.AutoMode:
+	case thermostat.AutoMode:
 		modeValue = 3
 	default:
 		modeValue = -1
 	}
 
-	thermofridgeMode.WithLabelValues(deviceID).Set(modeValue)
+	thermostatMode.WithLabelValues(deviceID).Set(modeValue)
 }
 
-func SetThermofridgeTargetTemperature(deviceID string, temperature int) {
-	thermofridgeTargetTemperature.WithLabelValues(deviceID).Set(float64(temperature))
+func SetThermostatTargetTemperature(deviceID string, temperature int) {
+	thermostatTargetTemperature.WithLabelValues(deviceID).Set(float64(temperature))
 }
 
-func SetThermofridgeOperatingState(deviceID string, mode thermofridge.OperatingState) {
+func SetThermostatOperatingState(deviceID string, mode thermostat.OperatingState) {
 	var modeValue float64
 	switch mode {
-	case thermofridge.IdleOperatingState:
+	case thermostat.IdleOperatingState:
 		modeValue = 0
-	case thermofridge.HeatingOperatingState:
+	case thermostat.HeatingOperatingState:
 		modeValue = 1
-	case thermofridge.CoolingOperatingState:
+	case thermostat.CoolingOperatingState:
 		modeValue = 2
 	default:
 		modeValue = -1
 	}
 
-	thermofridgeOperatingState.WithLabelValues(deviceID).Set(modeValue)
+	thermostatOperatingState.WithLabelValues(deviceID).Set(modeValue)
 }
 
-func SetThermofridgeCurrentTemperature(deviceID string, temperature float64) {
-	thermofridgeCurrentTemperature.WithLabelValues(deviceID).Set(temperature)
+func SetThermostatCurrentTemperature(deviceID string, temperature float64) {
+	thermostatCurrentTemperature.WithLabelValues(deviceID).Set(temperature)
 }

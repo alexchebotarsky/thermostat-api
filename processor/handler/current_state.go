@@ -5,18 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/alexchebotarsky/thermofridge-api/metrics"
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
-	"github.com/alexchebotarsky/thermofridge-api/processor/event"
+	"github.com/alexchebotarsky/thermostat-api/metrics"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
+	"github.com/alexchebotarsky/thermostat-api/processor/event"
 )
 
 type CurrentStateUpdater interface {
-	UpdateCurrentState(context.Context, *thermofridge.CurrentState) (*thermofridge.CurrentState, error)
+	UpdateCurrentState(context.Context, *thermostat.CurrentState) (*thermostat.CurrentState, error)
 }
 
 func CurrentState(updater CurrentStateUpdater) event.Handler {
 	return func(ctx context.Context, payload []byte) error {
-		var state thermofridge.CurrentState
+		var state thermostat.CurrentState
 		err := json.Unmarshal(payload, &state)
 		if err != nil {
 			return fmt.Errorf("error unmarshalling current state: %v", err)
@@ -32,8 +32,8 @@ func CurrentState(updater CurrentStateUpdater) event.Handler {
 			return fmt.Errorf("error updating current state: %v", err)
 		}
 
-		metrics.SetThermofridgeOperatingState(updatedState.DeviceID, updatedState.OperatingState)
-		metrics.SetThermofridgeCurrentTemperature(updatedState.DeviceID, updatedState.CurrentTemperature)
+		metrics.SetThermostatOperatingState(updatedState.DeviceID, updatedState.OperatingState)
+		metrics.SetThermostatCurrentTemperature(updatedState.DeviceID, updatedState.CurrentTemperature)
 
 		return nil
 	}

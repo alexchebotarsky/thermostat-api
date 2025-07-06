@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/metrics"
-	"github.com/alexchebotarsky/thermofridge-api/processor/event"
+	"github.com/alexchebotarsky/thermostat-api/metrics"
+	"github.com/alexchebotarsky/thermostat-api/processor/event"
 )
 
 func Metrics(eventName string, next event.Handler) event.Handler {

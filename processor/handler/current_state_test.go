@@ -7,16 +7,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 )
 
 type fakeCurrentStateUpdater struct {
-	States map[string]thermofridge.CurrentState
+	States map[string]thermostat.CurrentState
 
 	shouldFail bool
 }
 
-func (f *fakeCurrentStateUpdater) UpdateCurrentState(ctx context.Context, state *thermofridge.CurrentState) (*thermofridge.CurrentState, error) {
+func (f *fakeCurrentStateUpdater) UpdateCurrentState(ctx context.Context, state *thermostat.CurrentState) (*thermostat.CurrentState, error) {
 	if f.shouldFail {
 		return nil, errors.New("test error")
 	}
@@ -39,13 +39,13 @@ func TestCurrentState(t *testing.T) {
 		name              string
 		args              args
 		wantErr           bool
-		wantUpdaterStates map[string]thermofridge.CurrentState
+		wantUpdaterStates map[string]thermostat.CurrentState
 	}{
 		{
 			name: "should update current state",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermofridge.CurrentState{},
+					States:     map[string]thermostat.CurrentState{},
 					shouldFail: false,
 				},
 				payload: []byte(
@@ -58,10 +58,10 @@ func TestCurrentState(t *testing.T) {
 				),
 			},
 			wantErr: false,
-			wantUpdaterStates: map[string]thermofridge.CurrentState{
+			wantUpdaterStates: map[string]thermostat.CurrentState{
 				"test_device_id": {
 					DeviceID:           "test_device_id",
-					OperatingState:     thermofridge.HeatingOperatingState,
+					OperatingState:     thermostat.HeatingOperatingState,
 					CurrentTemperature: 18.8,
 					Timestamp:          now.Add(-5 * time.Minute),
 				},
@@ -71,7 +71,7 @@ func TestCurrentState(t *testing.T) {
 			name: "should error if payload is invalid JSON",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermofridge.CurrentState{},
+					States:     map[string]thermostat.CurrentState{},
 					shouldFail: false,
 				},
 				payload: []byte((`{
@@ -79,13 +79,13 @@ func TestCurrentState(t *testing.T) {
 				}`)),
 			},
 			wantErr:           true,
-			wantUpdaterStates: map[string]thermofridge.CurrentState{},
+			wantUpdaterStates: map[string]thermostat.CurrentState{},
 		},
 		{
 			name: "should error if payload has invalid values",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermofridge.CurrentState{},
+					States:     map[string]thermostat.CurrentState{},
 					shouldFail: false,
 				},
 				payload: []byte(
@@ -98,13 +98,13 @@ func TestCurrentState(t *testing.T) {
 				),
 			},
 			wantErr:           true,
-			wantUpdaterStates: map[string]thermofridge.CurrentState{},
+			wantUpdaterStates: map[string]thermostat.CurrentState{},
 		},
 		{
 			name: "should error if failed to update",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermofridge.CurrentState{},
+					States:     map[string]thermostat.CurrentState{},
 					shouldFail: true,
 				},
 				payload: []byte(
@@ -117,7 +117,7 @@ func TestCurrentState(t *testing.T) {
 				),
 			},
 			wantErr:           true,
-			wantUpdaterStates: map[string]thermofridge.CurrentState{},
+			wantUpdaterStates: map[string]thermostat.CurrentState{},
 		},
 	}
 	for _, tt := range tests {

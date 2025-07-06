@@ -1,8 +1,8 @@
 openapi: 3.1.1
 
 info:
-  title: thermofridge-api
-  description: API for my beer-brewing fridge that maintains set temperature
+  title: thermostat-api
+  description: API for controlling thermostat devices
   version: 1.0.0
 
 paths:

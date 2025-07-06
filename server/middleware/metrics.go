@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/metrics"
+	"github.com/alexchebotarsky/thermostat-api/metrics"
 	chi "github.com/go-chi/chi/v5"
 )
 

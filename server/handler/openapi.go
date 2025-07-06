@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/alexchebotarsky/thermofridge-api/openapi"
+	"github.com/alexchebotarsky/thermostat-api/openapi"
 )
 
 func OpenapiYAML(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 	"github.com/jmoiron/sqlx"
 
 	// sqlite driver
@@ -12,13 +12,13 @@ import (
 )
 
 type Client struct {
-	defaultMode              thermofridge.Mode
+	defaultMode              thermostat.Mode
 	defaultTargetTemperature int
 
 	db *sqlx.DB
 }
 
-func New(ctx context.Context, path string, defaultMode thermofridge.Mode, defaultTargetTemperature int) (*Client, error) {
+func New(ctx context.Context, path string, defaultMode thermostat.Mode, defaultTargetTemperature int) (*Client, error) {
 	var c Client
 	var err error
 

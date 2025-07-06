@@ -1,4 +1,4 @@
-package thermofridge
+package thermostat
 
 import "fmt"
 

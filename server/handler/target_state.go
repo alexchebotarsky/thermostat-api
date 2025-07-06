@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/alexchebotarsky/thermofridge-api/metrics"
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/metrics"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 	"github.com/go-chi/chi/v5"
 )
 
 type TargetStateFetcher interface {
-	FetchTargetState(ctx context.Context, deviceID string) (*thermofridge.TargetState, error)
+	FetchTargetState(ctx context.Context, deviceID string) (*thermostat.TargetState, error)
 }
 
 func GetTargetState(fetcher TargetStateFetcher) http.HandlerFunc {
@@ -26,11 +26,11 @@ func GetTargetState(fetcher TargetStateFetcher) http.HandlerFunc {
 		}
 
 		if state.Mode != nil {
-			metrics.SetThermofridgeMode(deviceID, *state.Mode)
+			metrics.SetThermostatMode(deviceID, *state.Mode)
 		}
 
 		if state.TargetTemperature != nil {
-			metrics.SetThermofridgeTargetTemperature(deviceID, *state.TargetTemperature)
+			metrics.SetThermostatTargetTemperature(deviceID, *state.TargetTemperature)
 		}
 
 		w.Header().Add("Content-Type", "application/json")
@@ -42,16 +42,16 @@ func GetTargetState(fetcher TargetStateFetcher) http.HandlerFunc {
 }
 
 type TargetStateUpdater interface {
-	UpdateTargetState(context.Context, *thermofridge.TargetState) (*thermofridge.TargetState, error)
+	UpdateTargetState(context.Context, *thermostat.TargetState) (*thermostat.TargetState, error)
 }
 
 type TargetStatePublisher interface {
-	PublishTargetState(context.Context, *thermofridge.TargetState) error
+	PublishTargetState(context.Context, *thermostat.TargetState) error
 }
 
 func UpdateTargetState(updater TargetStateUpdater, publisher TargetStatePublisher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var state thermofridge.TargetState
+		var state thermostat.TargetState
 		err := json.NewDecoder(r.Body).Decode(&state)
 		if err != nil {
 			HandleError(w, fmt.Errorf("error decoding target state: %v", err), http.StatusBadRequest, false)
@@ -80,11 +80,11 @@ func UpdateTargetState(updater TargetStateUpdater, publisher TargetStatePublishe
 		}
 
 		if updatedState.Mode != nil {
-			metrics.SetThermofridgeMode(deviceID, *updatedState.Mode)
+			metrics.SetThermostatMode(deviceID, *updatedState.Mode)
 		}
 
 		if updatedState.TargetTemperature != nil {
-			metrics.SetThermofridgeTargetTemperature(deviceID, *updatedState.TargetTemperature)
+			metrics.SetThermostatTargetTemperature(deviceID, *updatedState.TargetTemperature)
 		}
 
 		w.Header().Add("Content-Type", "application/json")

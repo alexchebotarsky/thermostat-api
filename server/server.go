@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/server/handler"
+	"github.com/alexchebotarsky/thermostat-api/server/handler"
 	chi "github.com/go-chi/chi/v5"
 )
 

@@ -9,17 +9,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexchebotarsky/thermofridge-api/client"
-	"github.com/alexchebotarsky/thermofridge-api/model/thermofridge"
+	"github.com/alexchebotarsky/thermostat-api/client"
+	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 )
 
 type fakeCurrentStateFetcher struct {
-	States map[string]thermofridge.CurrentState
+	States map[string]thermostat.CurrentState
 
 	shouldFail bool
 }
 
-func (f *fakeCurrentStateFetcher) FetchCurrentState(ctx context.Context, deviceID string) (*thermofridge.CurrentState, error) {
+func (f *fakeCurrentStateFetcher) FetchCurrentState(ctx context.Context, deviceID string) (*thermostat.CurrentState, error) {
 	if f.shouldFail {
 		return nil, errors.New("test error")
 	}
@@ -45,16 +45,16 @@ func TestGetCurrentState(t *testing.T) {
 		// HTTP response expectations
 		wantStatus int
 		wantErr    bool
-		wantBody   *thermofridge.CurrentState
+		wantBody   *thermostat.CurrentState
 	}{
 		{
 			name: "should fetch current state",
 			args: args{
 				fetcher: &fakeCurrentStateFetcher{
-					States: map[string]thermofridge.CurrentState{
+					States: map[string]thermostat.CurrentState{
 						"test_device_id": {
 							DeviceID:           "test_device_id",
-							OperatingState:     thermofridge.HeatingOperatingState,
+							OperatingState:     thermostat.HeatingOperatingState,
 							CurrentTemperature: 15.0,
 							Timestamp:          now.Add(-5 * time.Minute),
 						},
@@ -68,9 +68,9 @@ func TestGetCurrentState(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantErr:    false,
-			wantBody: &thermofridge.CurrentState{
+			wantBody: &thermostat.CurrentState{
 				DeviceID:           "test_device_id",
-				OperatingState:     thermofridge.HeatingOperatingState,
+				OperatingState:     thermostat.HeatingOperatingState,
 				CurrentTemperature: 15.0,
 				Timestamp:          now.Add(-5 * time.Minute),
 			},
@@ -79,7 +79,7 @@ func TestGetCurrentState(t *testing.T) {
 			name: "should return error 404, if current state not found",
 			args: args{
 				fetcher: &fakeCurrentStateFetcher{
-					States:     map[string]thermofridge.CurrentState{},
+					States:     map[string]thermostat.CurrentState{},
 					shouldFail: false,
 				},
 				req: addChiURLParams(
@@ -95,10 +95,10 @@ func TestGetCurrentState(t *testing.T) {
 			name: "should return error 500, if failed to fetch",
 			args: args{
 				fetcher: &fakeCurrentStateFetcher{
-					States: map[string]thermofridge.CurrentState{
+					States: map[string]thermostat.CurrentState{
 						"test_device_id": {
 							DeviceID:           "test_device_id",
-							OperatingState:     thermofridge.HeatingOperatingState,
+							OperatingState:     thermostat.HeatingOperatingState,
 							CurrentTemperature: 15.0,
 							Timestamp:          now.Add(-5 * time.Minute),
 						},
@@ -118,10 +118,10 @@ func TestGetCurrentState(t *testing.T) {
 			name: "should return error 500, if current state is invalid",
 			args: args{
 				fetcher: &fakeCurrentStateFetcher{
-					States: map[string]thermofridge.CurrentState{
+					States: map[string]thermostat.CurrentState{
 						"test_device_id": {
 							DeviceID:           "test_device_id",
-							OperatingState:     thermofridge.HeatingOperatingState,
+							OperatingState:     thermostat.HeatingOperatingState,
 							CurrentTemperature: -100.0,
 							Timestamp:          now.Add(-90 * time.Minute),
 						},
@@ -158,7 +158,7 @@ func TestGetCurrentState(t *testing.T) {
 			}
 
 			// Decode the response body into struct for checking
-			var resBody thermofridge.CurrentState
+			var resBody thermostat.CurrentState
 			if err := json.NewDecoder(w.Body).Decode(&resBody); err != nil {
 				t.Fatalf("GetCurrentState() error json decoding response body: %v", err)
 			}

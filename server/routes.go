@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/alexchebotarsky/thermofridge-api/server/handler"
-	"github.com/alexchebotarsky/thermofridge-api/server/middleware"
+	"github.com/alexchebotarsky/thermostat-api/server/handler"
+	"github.com/alexchebotarsky/thermostat-api/server/middleware"
 	chi "github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
