@@ -519,16 +519,16 @@ func TestUpdateTargetState(t *testing.T) {
 			for deviceID, wantState := range tt.wantUpdaterStates {
 				state, exists := tt.args.updater.States[deviceID]
 				if !exists {
-					t.Errorf("UpdateTargetState() updater.States[%q] not found", deviceID)
+					t.Errorf("UpdateTargetState() updater.States[%s] not found", deviceID)
 					continue
 				}
 
 				if !ptrEqual(state.Mode, wantState.Mode) {
-					t.Errorf("UpdateTargetState() updater.States[%q].Mode = %v, want %v", deviceID, state.Mode, wantState.Mode)
+					t.Errorf("UpdateTargetState() updater.States[%s].Mode = %v, want %v", deviceID, state.Mode, wantState.Mode)
 				}
 
 				if !ptrEqual(state.TargetTemperature, wantState.TargetTemperature) {
-					t.Errorf("UpdateTargetState() updater.States[%q].TargetTemperature = %v, want %v", deviceID, state.TargetTemperature, wantState.TargetTemperature)
+					t.Errorf("UpdateTargetState() updater.States[%s].TargetTemperature = %v, want %v", deviceID, state.TargetTemperature, wantState.TargetTemperature)
 				}
 			}
 

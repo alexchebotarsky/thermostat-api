@@ -232,24 +232,24 @@ func TestCurrentState(t *testing.T) {
 			for deviceID, wantState := range tt.wantUpdaterStates {
 				state, exists := tt.args.updater.States[deviceID]
 				if !exists {
-					t.Errorf("CurrentState() updater.States[%q] not found", deviceID)
+					t.Errorf("CurrentState() updater.States[%s] not found", deviceID)
 					continue
 				}
 
 				if !state.Timestamp.Equal(wantState.Timestamp) {
-					t.Errorf("CurrentState() updater.States[%q].Timestamp = %v, want %v", deviceID, state.Timestamp, wantState.Timestamp)
+					t.Errorf("CurrentState() updater.States[%s].Timestamp = %v, want %v", deviceID, state.Timestamp, wantState.Timestamp)
 				}
 
 				if state.OperatingState != wantState.OperatingState {
-					t.Errorf("CurrentState() updater.States[%q].OperationState = %v, want %v", deviceID, state.OperatingState, wantState.OperatingState)
+					t.Errorf("CurrentState() updater.States[%s].OperationState = %v, want %v", deviceID, state.OperatingState, wantState.OperatingState)
 				}
 
 				if state.CurrentTemperature != wantState.CurrentTemperature {
-					t.Errorf("CurrentState() updater.States[%q].TargetTemperature = %v, want %v", deviceID, state.CurrentTemperature, wantState.CurrentTemperature)
+					t.Errorf("CurrentState() updater.States[%s].TargetTemperature = %v, want %v", deviceID, state.CurrentTemperature, wantState.CurrentTemperature)
 				}
 
 				if !ptrEqual(state.CurrentHumidity, wantState.CurrentHumidity) {
-					t.Errorf("CurrentState() updater.States[%q].CurrentHumidity = %v, want %v", deviceID, state.CurrentHumidity, wantState.CurrentHumidity)
+					t.Errorf("CurrentState() updater.States[%s].CurrentHumidity = %v, want %v", deviceID, state.CurrentHumidity, wantState.CurrentHumidity)
 				}
 			}
 		})
