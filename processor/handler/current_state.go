@@ -34,6 +34,9 @@ func CurrentState(updater CurrentStateUpdater) event.Handler {
 
 		metrics.SetThermostatOperatingState(updatedState.DeviceID, updatedState.OperatingState)
 		metrics.SetThermostatCurrentTemperature(updatedState.DeviceID, updatedState.CurrentTemperature)
+		if updatedState.CurrentHumidity != nil {
+			metrics.SetThermostatCurrentHumidity(updatedState.DeviceID, *updatedState.CurrentHumidity)
+		}
 
 		return nil
 	}

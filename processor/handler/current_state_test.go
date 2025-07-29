@@ -30,6 +30,8 @@ func (f *fakeCurrentStateUpdater) UpdateCurrentState(ctx context.Context, state 
 
 func TestCurrentState(t *testing.T) {
 	now := time.Now()
+	initialCurrentHumidity := 43.3
+	updatedCurrentHumidity := 45.6
 
 	type args struct {
 		updater *fakeCurrentStateUpdater
@@ -45,7 +47,50 @@ func TestCurrentState(t *testing.T) {
 			name: "should update current state",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermostat.CurrentState{},
+					States: map[string]thermostat.CurrentState{
+						"test_device_id": {
+							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-30 * time.Minute),
+							OperatingState:     thermostat.IdleOperatingState,
+							CurrentTemperature: 17.5,
+							CurrentHumidity:    &initialCurrentHumidity,
+						},
+					},
+					shouldFail: false,
+				},
+				payload: []byte(
+					fmt.Sprintf(`{
+						"deviceId": "test_device_id",
+						"timestamp": "%s",
+						"operatingState": "HEATING",
+						"currentTemperature": 18.8,
+						"currentHumidity": 45.6
+					}`, now.Add(-5*time.Minute).Format(time.RFC3339Nano)),
+				),
+			},
+			wantErr: false,
+			wantUpdaterStates: map[string]thermostat.CurrentState{
+				"test_device_id": {
+					DeviceID:           "test_device_id",
+					Timestamp:          now.Add(-5 * time.Minute),
+					OperatingState:     thermostat.HeatingOperatingState,
+					CurrentTemperature: 18.8,
+					CurrentHumidity:    &updatedCurrentHumidity,
+				},
+			},
+		},
+		{
+			name: "should update current state without humidity",
+			args: args{
+				updater: &fakeCurrentStateUpdater{
+					States: map[string]thermostat.CurrentState{
+						"test_device_id": {
+							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-30 * time.Minute),
+							OperatingState:     thermostat.IdleOperatingState,
+							CurrentTemperature: 17.5,
+						},
+					},
 					shouldFail: false,
 				},
 				payload: []byte(
@@ -71,21 +116,45 @@ func TestCurrentState(t *testing.T) {
 			name: "should error if payload is invalid JSON",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermostat.CurrentState{},
+					States: map[string]thermostat.CurrentState{
+						"test_device_id": {
+							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-30 * time.Minute),
+							OperatingState:     thermostat.IdleOperatingState,
+							CurrentTemperature: 17.5,
+							CurrentHumidity:    &initialCurrentHumidity,
+						},
+					},
 					shouldFail: false,
 				},
 				payload: []byte((`{
 					"deviceId":
 				}`)),
 			},
-			wantErr:           true,
-			wantUpdaterStates: map[string]thermostat.CurrentState{},
+			wantErr: true,
+			wantUpdaterStates: map[string]thermostat.CurrentState{
+				"test_device_id": {
+					DeviceID:           "test_device_id",
+					Timestamp:          now.Add(-30 * time.Minute),
+					OperatingState:     thermostat.IdleOperatingState,
+					CurrentTemperature: 17.5,
+					CurrentHumidity:    &initialCurrentHumidity,
+				},
+			},
 		},
 		{
 			name: "should error if payload has invalid values",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermostat.CurrentState{},
+					States: map[string]thermostat.CurrentState{
+						"test_device_id": {
+							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-30 * time.Minute),
+							OperatingState:     thermostat.IdleOperatingState,
+							CurrentTemperature: 17.5,
+							CurrentHumidity:    &initialCurrentHumidity,
+						},
+					},
 					shouldFail: false,
 				},
 				payload: []byte(
@@ -93,18 +162,35 @@ func TestCurrentState(t *testing.T) {
 						"deviceId": "test_device_id",
 						"timestamp": "%s",
 						"operatingState": "HEATING",
-						"currentTemperature": -100.0
+						"currentTemperature": -100.0,
+						"currentHumidity": 105.0
 					}`, now.Add(-90*time.Minute).Format(time.RFC3339Nano)),
 				),
 			},
-			wantErr:           true,
-			wantUpdaterStates: map[string]thermostat.CurrentState{},
+			wantErr: true,
+			wantUpdaterStates: map[string]thermostat.CurrentState{
+				"test_device_id": {
+					DeviceID:           "test_device_id",
+					Timestamp:          now.Add(-30 * time.Minute),
+					OperatingState:     thermostat.IdleOperatingState,
+					CurrentTemperature: 17.5,
+					CurrentHumidity:    &initialCurrentHumidity,
+				},
+			},
 		},
 		{
 			name: "should error if failed to update",
 			args: args{
 				updater: &fakeCurrentStateUpdater{
-					States:     map[string]thermostat.CurrentState{},
+					States: map[string]thermostat.CurrentState{
+						"test_device_id": {
+							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-30 * time.Minute),
+							OperatingState:     thermostat.IdleOperatingState,
+							CurrentTemperature: 17.5,
+							CurrentHumidity:    &initialCurrentHumidity,
+						},
+					},
 					shouldFail: true,
 				},
 				payload: []byte(
@@ -112,12 +198,21 @@ func TestCurrentState(t *testing.T) {
 						"deviceId": "test_device_id",
 						"timestamp": "%s",
 						"operatingState": "HEATING",
-						"currentTemperature": 18.8
+						"currentTemperature": 18.8,
+						"currentHumidity": 45.6
 					}`, now.Add(-5*time.Minute).Format(time.RFC3339Nano)),
 				),
 			},
-			wantErr:           true,
-			wantUpdaterStates: map[string]thermostat.CurrentState{},
+			wantErr: true,
+			wantUpdaterStates: map[string]thermostat.CurrentState{
+				"test_device_id": {
+					DeviceID:           "test_device_id",
+					Timestamp:          now.Add(-30 * time.Minute),
+					OperatingState:     thermostat.IdleOperatingState,
+					CurrentTemperature: 17.5,
+					CurrentHumidity:    &initialCurrentHumidity,
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -152,7 +247,21 @@ func TestCurrentState(t *testing.T) {
 				if state.CurrentTemperature != wantState.CurrentTemperature {
 					t.Errorf("CurrentState() updater.States[%q].TargetTemperature = %v, want %v", deviceID, state.CurrentTemperature, wantState.CurrentTemperature)
 				}
+
+				if !ptrEqual(state.CurrentHumidity, wantState.CurrentHumidity) {
+					t.Errorf("CurrentState() updater.States[%q].CurrentHumidity = %v, want %v", deviceID, state.CurrentHumidity, wantState.CurrentHumidity)
+				}
 			}
 		})
 	}
+}
+
+func ptrEqual[T comparable](a, b *T) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	return *a == *b
 }

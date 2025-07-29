@@ -141,6 +141,12 @@ components:
       description: Current measured temperature in Celsius
       minimum: -55
       maximum: 125
+    currentHumidity:
+      type: number
+      format: float
+      description: Current measured humidity percentage
+      minimum: 0
+      maximum: 100
     TargetState:
       type: object
       properties:
@@ -161,6 +167,8 @@ components:
           $ref: "#/components/schemas/operatingState"
         currentTemperature:
           $ref: "#/components/schemas/currentTemperature"
+        currentHumidity:
+          $ref: "#/components/schemas/currentHumidity"
     ErrorResponse:
       type: object
       properties:

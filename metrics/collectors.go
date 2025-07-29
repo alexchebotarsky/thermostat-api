@@ -54,6 +54,10 @@ var (
 		Name: "thermostat_current_temperature",
 		Help: "Current temperature reading of the thermostat",
 	}, []string{"device_id"}))
+	thermostatCurrentHumidity = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "thermostat_current_humidity",
+		Help: "Current humidity reading of the thermostat",
+	}, []string{"device_id"}))
 )
 
 func AddRequestHandled(routeName string, statusCode int) {
@@ -112,4 +116,8 @@ func SetThermostatOperatingState(deviceID string, mode thermostat.OperatingState
 
 func SetThermostatCurrentTemperature(deviceID string, temperature float64) {
 	thermostatCurrentTemperature.WithLabelValues(deviceID).Set(temperature)
+}
+
+func SetThermostatCurrentHumidity(deviceID string, humidity float64) {
+	thermostatCurrentHumidity.WithLabelValues(deviceID).Set(humidity)
 }

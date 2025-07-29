@@ -10,6 +10,7 @@ type CurrentState struct {
 	Timestamp          time.Time      `json:"timestamp" db:"timestamp"`
 	OperatingState     OperatingState `json:"operatingState" db:"operating_state"`
 	CurrentTemperature float64        `json:"currentTemperature" db:"current_temperature"`
+	CurrentHumidity    *float64       `json:"currentHumidity" db:"current_humidity"` // Not all thermostats may report humidity
 }
 
 func (s *CurrentState) Validate() error {
@@ -30,6 +31,12 @@ func (s *CurrentState) Validate() error {
 
 	if s.CurrentTemperature < -55 || s.CurrentTemperature > 125 {
 		return fmt.Errorf("current temperature must be in range [-55,125]. got: %.2f", s.CurrentTemperature)
+	}
+
+	if s.CurrentHumidity != nil {
+		if *s.CurrentHumidity < 0 || *s.CurrentHumidity > 100 {
+			return fmt.Errorf("current humidity must be in range [0,100]. got: %.2f", *s.CurrentHumidity)
+		}
 	}
 
 	return nil
