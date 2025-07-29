@@ -144,7 +144,10 @@ components:
     currentHumidity:
       type: number
       format: float
-      description: Current measured humidity percentage
+      description: |
+        Current measured humidity percentage.
+
+        Optional. Not all devices may support humidity measurement.
       minimum: 0
       maximum: 100
     TargetState:
