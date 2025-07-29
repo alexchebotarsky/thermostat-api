@@ -54,9 +54,9 @@ func TestGetCurrentState(t *testing.T) {
 					States: map[string]thermostat.CurrentState{
 						"test_device_id": {
 							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-5 * time.Minute),
 							OperatingState:     thermostat.HeatingOperatingState,
 							CurrentTemperature: 15.0,
-							Timestamp:          now.Add(-5 * time.Minute),
 						},
 					},
 					shouldFail: false,
@@ -70,9 +70,9 @@ func TestGetCurrentState(t *testing.T) {
 			wantErr:    false,
 			wantBody: &thermostat.CurrentState{
 				DeviceID:           "test_device_id",
+				Timestamp:          now.Add(-5 * time.Minute),
 				OperatingState:     thermostat.HeatingOperatingState,
 				CurrentTemperature: 15.0,
-				Timestamp:          now.Add(-5 * time.Minute),
 			},
 		},
 		{
@@ -98,9 +98,9 @@ func TestGetCurrentState(t *testing.T) {
 					States: map[string]thermostat.CurrentState{
 						"test_device_id": {
 							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-5 * time.Minute),
 							OperatingState:     thermostat.HeatingOperatingState,
 							CurrentTemperature: 15.0,
-							Timestamp:          now.Add(-5 * time.Minute),
 						},
 					},
 					shouldFail: true,
@@ -121,9 +121,9 @@ func TestGetCurrentState(t *testing.T) {
 					States: map[string]thermostat.CurrentState{
 						"test_device_id": {
 							DeviceID:           "test_device_id",
+							Timestamp:          now.Add(-90 * time.Minute),
 							OperatingState:     thermostat.HeatingOperatingState,
 							CurrentTemperature: -100.0,
-							Timestamp:          now.Add(-90 * time.Minute),
 						},
 					},
 					shouldFail: false,
@@ -167,14 +167,14 @@ func TestGetCurrentState(t *testing.T) {
 			if resBody.DeviceID != tt.wantBody.DeviceID {
 				t.Errorf("GetCurrentState() response deviceID = %v, want %v", resBody.DeviceID, tt.wantBody.DeviceID)
 			}
+			if !resBody.Timestamp.Equal(tt.wantBody.Timestamp) {
+				t.Errorf("GetCurrentState() response timestamp = %v, want %v", resBody.Timestamp, tt.wantBody.Timestamp)
+			}
 			if resBody.OperatingState != tt.wantBody.OperatingState {
 				t.Errorf("GetCurrentState() response operatingState = %v, want %v", resBody.OperatingState, tt.wantBody.OperatingState)
 			}
 			if resBody.CurrentTemperature != tt.wantBody.CurrentTemperature {
 				t.Errorf("GetCurrentState() response currentTemperature = %v, want %v", resBody.CurrentTemperature, tt.wantBody.CurrentTemperature)
-			}
-			if !resBody.Timestamp.Equal(tt.wantBody.Timestamp) {
-				t.Errorf("GetCurrentState() response timestamp = %v, want %v", resBody.Timestamp, tt.wantBody.Timestamp)
 			}
 		})
 	}

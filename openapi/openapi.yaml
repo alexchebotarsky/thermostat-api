@@ -109,6 +109,11 @@ components:
       type: string
       description: Unique identifier for the device
       example: "2bd15a47-5bf5-46b0-9cdd-cb18d63cb494"
+    timestamp:
+      type: string
+      format: date-time
+      description: Timestamp in RFC3339 format
+      example: "2024-06-07T12:34:56Z"
     mode:
       type: string
       description: Chosen mode for the device
@@ -136,11 +141,6 @@ components:
       description: Current measured temperature in Celsius
       minimum: -55
       maximum: 125
-    timestamp:
-      type: string
-      format: date-time
-      description: Timestamp in RFC3339 format
-      example: "2024-06-07T12:34:56Z"
     TargetState:
       type: object
       properties:
@@ -155,12 +155,12 @@ components:
       properties:
         deviceId:
           $ref: "#/components/schemas/deviceId"
+        timestamp:
+          $ref: "#/components/schemas/timestamp"
         operatingState:
           $ref: "#/components/schemas/operatingState"
         currentTemperature:
           $ref: "#/components/schemas/currentTemperature"
-        timestamp:
-          $ref: "#/components/schemas/timestamp"
     ErrorResponse:
       type: object
       properties:

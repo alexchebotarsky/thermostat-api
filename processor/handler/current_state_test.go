@@ -51,9 +51,9 @@ func TestCurrentState(t *testing.T) {
 				payload: []byte(
 					fmt.Sprintf(`{
 						"deviceId": "test_device_id",
+						"timestamp": "%s",
 						"operatingState": "HEATING",
-						"currentTemperature": 18.8,
-						"timestamp": "%s"
+						"currentTemperature": 18.8
 					}`, now.Add(-5*time.Minute).Format(time.RFC3339Nano)),
 				),
 			},
@@ -61,9 +61,9 @@ func TestCurrentState(t *testing.T) {
 			wantUpdaterStates: map[string]thermostat.CurrentState{
 				"test_device_id": {
 					DeviceID:           "test_device_id",
+					Timestamp:          now.Add(-5 * time.Minute),
 					OperatingState:     thermostat.HeatingOperatingState,
 					CurrentTemperature: 18.8,
-					Timestamp:          now.Add(-5 * time.Minute),
 				},
 			},
 		},
@@ -91,9 +91,9 @@ func TestCurrentState(t *testing.T) {
 				payload: []byte(
 					fmt.Sprintf(`{
 						"deviceId": "test_device_id",
+						"timestamp": "%s",
 						"operatingState": "HEATING",
-						"currentTemperature": -100.0,
-						"timestamp": "%s"
+						"currentTemperature": -100.0
 					}`, now.Add(-90*time.Minute).Format(time.RFC3339Nano)),
 				),
 			},
@@ -110,9 +110,9 @@ func TestCurrentState(t *testing.T) {
 				payload: []byte(
 					fmt.Sprintf(`{
 						"deviceId": "test_device_id",
+						"timestamp": "%s",
 						"operatingState": "HEATING",
-						"currentTemperature": 18.8,
-						"timestamp": "%s"
+						"currentTemperature": 18.8
 					}`, now.Add(-5*time.Minute).Format(time.RFC3339Nano)),
 				),
 			},
@@ -141,16 +141,16 @@ func TestCurrentState(t *testing.T) {
 					continue
 				}
 
+				if !state.Timestamp.Equal(wantState.Timestamp) {
+					t.Errorf("CurrentState() updater.States[%q].Timestamp = %v, want %v", deviceID, state.Timestamp, wantState.Timestamp)
+				}
+
 				if state.OperatingState != wantState.OperatingState {
 					t.Errorf("CurrentState() updater.States[%q].OperationState = %v, want %v", deviceID, state.OperatingState, wantState.OperatingState)
 				}
 
 				if state.CurrentTemperature != wantState.CurrentTemperature {
 					t.Errorf("CurrentState() updater.States[%q].TargetTemperature = %v, want %v", deviceID, state.CurrentTemperature, wantState.CurrentTemperature)
-				}
-
-				if !state.Timestamp.Equal(wantState.Timestamp) {
-					t.Errorf("CurrentState() updater.States[%q].Timestamp = %v, want %v", deviceID, state.Timestamp, wantState.Timestamp)
 				}
 			}
 		})
