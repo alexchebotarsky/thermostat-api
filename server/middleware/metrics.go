@@ -19,8 +19,13 @@ func Metrics(next http.Handler) http.Handler {
 
 		routeName := fmt.Sprintf("%s %s", r.Method, chi.RouteContext(r.Context()).RoutePattern())
 
-		metrics.AddRequestHandled(routeName, crw.status)
-		metrics.ObserveRequestDuration(duration)
+		deviceID := chi.URLParam(r, "deviceID")
+		if deviceID == "" {
+			deviceID = "n/a"
+		}
+
+		metrics.AddRequestHandled(routeName, crw.status, deviceID)
+		metrics.ObserveRequestDuration(routeName, crw.status, deviceID, duration)
 	})
 }
 

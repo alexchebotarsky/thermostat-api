@@ -14,26 +14,26 @@ var (
 		Name: "requests_handled",
 		Help: "Handled requests counter and metadata associated with them",
 	},
-		[]string{"route_name", "status_code"},
+		[]string{"route_name", "status_code", "device_id"},
 	))
-	requestsDuration = newCollector(prometheus.NewHistogram(prometheus.HistogramOpts{
+	requestsDuration = newCollector(prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "requests_duration",
 		Help:    "Time spent processing requests",
 		Buckets: []float64{.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, math.Inf(1)},
-	}))
+	}, []string{"route_name", "status_code", "device_id"}))
 
 	eventsProcessed = newCollector(prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "events_processed",
 		Help: "Handled PubSub events counter and metadata associated with them",
 	},
-		[]string{"event_name", "status"},
+		[]string{"event_name", "status", "device_id"},
 	))
 	eventsDuration = newCollector(prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "events_duration",
 		Help:    "Time spent processing events",
 		Buckets: []float64{.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, math.Inf(1)},
 	},
-		[]string{"event_name"},
+		[]string{"event_name", "status", "device_id"},
 	))
 
 	thermostatMode = newCollector(prometheus.NewGaugeVec(prometheus.GaugeOpts{
@@ -60,20 +60,20 @@ var (
 	}, []string{"device_id"}))
 )
 
-func AddRequestHandled(routeName string, statusCode int) {
-	requestsHandled.WithLabelValues(routeName, strconv.Itoa(statusCode)).Inc()
+func AddRequestHandled(routeName string, statusCode int, deviceID string) {
+	requestsHandled.WithLabelValues(routeName, strconv.Itoa(statusCode), deviceID).Inc()
 }
 
-func ObserveRequestDuration(duration time.Duration) {
-	requestsDuration.Observe(duration.Seconds())
+func ObserveRequestDuration(routeName string, statusCode int, deviceID string, duration time.Duration) {
+	requestsDuration.WithLabelValues(routeName, strconv.Itoa(statusCode), deviceID).Observe(duration.Seconds())
 }
 
-func AddEventProcessed(eventName, status string) {
-	eventsProcessed.WithLabelValues(eventName, status).Inc()
+func AddEventProcessed(eventName, status, deviceID string) {
+	eventsProcessed.WithLabelValues(eventName, status, deviceID).Inc()
 }
 
-func ObserveEventDuration(eventName string, duration time.Duration) {
-	eventsDuration.WithLabelValues(eventName).Observe(duration.Seconds())
+func ObserveEventDuration(eventName, status, deviceID string, duration time.Duration) {
+	eventsDuration.WithLabelValues(eventName, status, deviceID).Observe(duration.Seconds())
 }
 
 func SetThermostatMode(deviceID string, mode thermostat.Mode) {
