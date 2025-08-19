@@ -19,8 +19,8 @@ func (s *TargetState) Validate() error {
 	}
 
 	if s.TargetTemperature != nil {
-		if *s.TargetTemperature < 0 || *s.TargetTemperature > 25 {
-			return fmt.Errorf("target temperature must be in range [0,25]. got: %d", *s.TargetTemperature)
+		if *s.TargetTemperature < 0 || *s.TargetTemperature > 30 {
+			return fmt.Errorf("target temperature must be in range [0,30]. got: %d", *s.TargetTemperature)
 		}
 	}
 

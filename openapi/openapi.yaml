@@ -127,7 +127,7 @@ components:
       format: int
       description: Configured target temperature in Celsius
       minimum: 0
-      maximum: 25
+      maximum: 30
     operatingState:
       type: string
       description: Current operating state of the device
