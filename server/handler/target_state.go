@@ -25,14 +25,6 @@ func GetTargetState(fetcher TargetStateFetcher) http.HandlerFunc {
 			return
 		}
 
-		if state.Mode != nil {
-			metrics.SetThermostatMode(deviceID, *state.Mode)
-		}
-
-		if state.TargetTemperature != nil {
-			metrics.SetThermostatTargetTemperature(deviceID, *state.TargetTemperature)
-		}
-
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 

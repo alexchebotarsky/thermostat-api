@@ -35,6 +35,11 @@ func New(ctx context.Context, path string, defaultMode thermostat.Mode, defaultT
 		return nil, fmt.Errorf("error initializing target state table: %v", err)
 	}
 
+	err = c.reportTargetStateMetrics(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error reporting initial target state metrics: %v", err)
+	}
+
 	err = c.initCurrentStateTable(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing current state table: %v", err)

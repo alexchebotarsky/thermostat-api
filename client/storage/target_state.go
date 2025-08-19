@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/alexchebotarsky/thermostat-api/metrics"
 	"github.com/alexchebotarsky/thermostat-api/model/thermostat"
 )
 
@@ -20,6 +21,31 @@ func (c *Client) initTargetStateTable(ctx context.Context) error {
 	_, err := c.db.ExecContext(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("error executing target state schema: %v", err)
+	}
+
+	return nil
+}
+
+func (c *Client) reportTargetStateMetrics(ctx context.Context) error {
+	query := `
+		SELECT device_id, target_temperature, mode
+		FROM target_state
+	`
+
+	var states []thermostat.TargetState
+	err := c.db.SelectContext(ctx, &states, query)
+	if err != nil {
+		return fmt.Errorf("error executing reportTargetStateMetrics query: %v", err)
+	}
+
+	for _, state := range states {
+		if state.Mode != nil {
+			metrics.SetThermostatMode(state.DeviceID, *state.Mode)
+		}
+
+		if state.TargetTemperature != nil {
+			metrics.SetThermostatTargetTemperature(state.DeviceID, *state.TargetTemperature)
+		}
 	}
 
 	return nil
