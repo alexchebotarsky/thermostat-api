@@ -1,15 +1,15 @@
 module github.com/alexchebotarsky/thermostat-api
 
-go 1.24.4
+go 1.24.6
 
 require (
 	github.com/eclipse/paho.golang v0.22.0
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
-	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus/client_golang v1.23.0
 	github.com/sethvargo/go-envconfig v1.3.0
-	modernc.org/sqlite v1.38.0
+	modernc.org/sqlite v1.38.2
 )
 
 require (
@@ -23,13 +23,13 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.65.0 // indirect
-	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
-	golang.org/x/net v0.41.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
-	modernc.org/libc v1.66.2 // indirect
+	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	google.golang.org/protobuf v1.36.7 // indirect
+	modernc.org/libc v1.66.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
