@@ -10,11 +10,12 @@ import (
 	"github.com/alexchebotarsky/thermostat-api/processor/event"
 )
 
-type CurrentStateUpdater interface {
+type CurrentStateManager interface {
+	FetchCurrentState(ctx context.Context, deviceID string) (*thermostat.CurrentState, error)
 	UpdateCurrentState(context.Context, *thermostat.CurrentState) (*thermostat.CurrentState, error)
 }
 
-func CurrentState(updater CurrentStateUpdater) event.Handler {
+func CurrentState(manager CurrentStateManager) event.Handler {
 	return func(ctx context.Context, payload []byte) error {
 		var state thermostat.CurrentState
 		err := json.Unmarshal(payload, &state)
@@ -27,7 +28,14 @@ func CurrentState(updater CurrentStateUpdater) event.Handler {
 			return fmt.Errorf("error validating current state: %v", err)
 		}
 
-		updatedState, err := updater.UpdateCurrentState(ctx, &state)
+		lastState, err := manager.FetchCurrentState(ctx, state.DeviceID)
+		if err != nil {
+			// Failed to fetch last known state, ignore
+		} else if state.Timestamp.Before(lastState.Timestamp) {
+			return fmt.Errorf("current state is older than the last known state for device %s", state.DeviceID)
+		}
+
+		updatedState, err := manager.UpdateCurrentState(ctx, &state)
 		if err != nil {
 			return fmt.Errorf("error updating current state: %v", err)
 		}

@@ -25,7 +25,7 @@ type PubSubClient interface {
 }
 
 type StorageClient interface {
-	handler.CurrentStateUpdater
+	handler.CurrentStateManager
 }
 
 func New(clients Clients) *Processor {
