@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"slices"
 
 	"github.com/alexchebotarsky/thermostat-api/processor/event"
 	"github.com/alexchebotarsky/thermostat-api/processor/handler"
@@ -44,6 +45,10 @@ func (p *Processor) Start(ctx context.Context, errc chan<- error) {
 		middlewares := make([]event.Middleware, 0, len(p.Middlewares)+len(e.Middlewares))
 		middlewares = append(middlewares, p.Middlewares...)
 		middlewares = append(middlewares, e.Middlewares...)
+
+		// Middlewares should be applied in the order they are defined, but this
+		// means we have to reverse them before applying.
+		slices.Reverse(middlewares)
 
 		// Apply relevant middlewares before listening to the event
 		for _, middleware := range middlewares {
