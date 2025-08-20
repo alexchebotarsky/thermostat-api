@@ -8,7 +8,7 @@ Add custom systemctl service in `/etc/systemd/system/thermostat-api.service`:
 [Unit]
 Description=Thermostat API
 After=network.target docker.service monitoring.service mqtt.service
-Requires=docker.service monitoring.service mqtt.service
+Requires=docker.service
 
 [Service]
 Type=simple
