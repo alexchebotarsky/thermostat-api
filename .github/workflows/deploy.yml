@@ -1,0 +1,22 @@
+name: Deploy on Raspberry Pi
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create systemd service
+        run: |
+          export REPO_NAME=$(basename $GITHUB_REPOSITORY)
+          export SERVICE_PATH="/etc/systemd/system/${REPO_NAME}.service"
+
+          envsubst < $GITHUB_WORKSPACE/.github/deploy/systemd.service | sudo tee $SERVICE_PATH
+
+          sudo systemctl daemon-reload
+          sudo systemctl enable ${REPO_NAME}.service
+          sudo systemctl restart ${REPO_NAME}.service
