@@ -5,7 +5,7 @@ Requires=docker.service
 
 [Service]
 Type=simple
-User=goodleby
+User=${USER}
 WorkingDirectory=${GITHUB_WORKSPACE}
 ExecStart=docker compose up --build
 ExecStop=docker compose down

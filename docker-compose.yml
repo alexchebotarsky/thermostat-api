@@ -21,7 +21,12 @@ services:
       - monitoring_network
     volumes:
       - data:/data
-    restart: on-failure
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/_healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
 networks:
   mqtt_network:
     external: true

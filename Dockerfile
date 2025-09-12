@@ -14,6 +14,9 @@ RUN CGO_ENABLED=0 go build -o ./main ./cmd/app/main.go
 
 FROM alpine:3.19 AS runner
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 COPY --from=builder /app/main /app/main
 
 EXPOSE 8000
