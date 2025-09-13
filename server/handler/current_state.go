@@ -33,12 +33,12 @@ func GetCurrentState(fetcher CurrentStateFetcher) http.HandlerFunc {
 
 		err = state.Validate()
 		if err != nil {
+			// Clear metrics for invalid device
+			metrics.DeleteThermostatMetrics(deviceID)
+
 			HandleError(w, fmt.Errorf("error invalid current state: %v", err), http.StatusInternalServerError, true)
 			return
 		}
-
-		metrics.SetThermostatOperatingState(deviceID, state.OperatingState)
-		metrics.SetThermostatCurrentTemperature(deviceID, state.CurrentTemperature)
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

@@ -121,3 +121,14 @@ func SetThermostatCurrentTemperature(deviceID string, temperature float64) {
 func SetThermostatCurrentHumidity(deviceID string, humidity float64) {
 	thermostatCurrentHumidity.WithLabelValues(deviceID).Set(humidity)
 }
+
+func DeleteThermostatMetrics(deviceID string) {
+	// Target state
+	thermostatMode.DeleteLabelValues(deviceID)
+	thermostatTargetTemperature.DeleteLabelValues(deviceID)
+
+	// Current state
+	thermostatOperatingState.DeleteLabelValues(deviceID)
+	thermostatCurrentTemperature.DeleteLabelValues(deviceID)
+	thermostatCurrentHumidity.DeleteLabelValues(deviceID)
+}
