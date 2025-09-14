@@ -13,8 +13,8 @@ func (c *Client) initTargetStateTable(ctx context.Context) error {
 	schema := `
 		CREATE TABLE IF NOT EXISTS target_state (
 			device_id TEXT PRIMARY KEY,
-			target_temperature INTEGER,
-			mode TEXT
+			mode TEXT,
+			target_temperature INTEGER
 		);
 	`
 
@@ -28,7 +28,7 @@ func (c *Client) initTargetStateTable(ctx context.Context) error {
 
 func (c *Client) reportTargetStateMetrics(ctx context.Context) error {
 	query := `
-		SELECT device_id, target_temperature, mode
+		SELECT device_id, mode, target_temperature
 		FROM target_state
 	`
 
@@ -53,7 +53,7 @@ func (c *Client) reportTargetStateMetrics(ctx context.Context) error {
 
 func (c *Client) FetchTargetState(ctx context.Context, deviceID string) (*thermostat.TargetState, error) {
 	query := `
-		SELECT target_temperature, mode
+		SELECT mode, target_temperature
 		FROM target_state
 		WHERE device_id = $1;
 	`
