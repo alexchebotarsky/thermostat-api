@@ -20,7 +20,7 @@ jobs:
           name: Create/Update systemd service
           command: |
             SERVICE_FILE="/etc/systemd/system/${CIRCLE_PROJECT_REPONAME}.service"
-            TEMPLATE_FILE=".github/deploy/systemd.service"
+            TEMPLATE_FILE="./.circleci/systemd.service"
             envsubst < $TEMPLATE_FILE | sudo tee $SERVICE_FILE
 
             sudo systemctl daemon-reload
