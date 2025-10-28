@@ -13,6 +13,7 @@ jobs:
   deploy:
     machine:
       resource_class: alex/raspberrypi
+    working_directory: /var/lib/circleci-runner/<< pipeline.project.slug >>
     steps:
       - checkout
 
